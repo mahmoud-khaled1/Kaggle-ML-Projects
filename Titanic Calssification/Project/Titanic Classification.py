@@ -246,8 +246,8 @@ def Logistaccc_Calssification():
     # Make Predicted
     y_pre = Logistic_Regression_model.predict(X_test)
 
-    print(y_test[:15])
-    print(y_pre[:15])
+    print(list(y_test[:15]))
+    print(list(y_pre[:15]))
 
     # Calculted Coufusion matrix
     # [TP     FP
@@ -256,13 +256,121 @@ def Logistaccc_Calssification():
     CM = confusion_matrix(y_test, y_pre)
     print("Confusion Matrix :")
     print(CM)
+
     # show all correlation between output and all features
     coeff_df = pd.DataFrame(train_df.columns.delete(0))
     coeff_df.columns = ['Feature']
     coeff_df["Correlation"] = pd.Series(Logistic_Regression_model.coef_[0])
-
     coeff_df.sort_values(by='Correlation', ascending=False)
+    return Logistic_Regression_model.score(X_train, y_train)
 
 
-Logistaccc_Calssification()
+def SVM():
+    SVC_model = SVC(C=1,kernel='linear',gamma='auto',max_iter=10000,random_state=44)
+    SVC_model.fit(X_train, y_train)
+    # Print Details
+    print("Train Score :", SVC_model.score(X_train, y_train))
+    print("Test Score :", SVC_model.score(X_test, y_test))
+    print("No of Iteration :", SVC_model.max_iter)
 
+    # make Predicted
+    Y_pre = SVC_model.predict(X_test)
+
+    print(list(Y_pre[:10]))
+    print(list(y_test[:10]))
+    from sklearn.metrics import confusion_matrix
+    CM = confusion_matrix(y_true=y_test, y_pred=Y_pre)
+    print(CM)
+    return SVC_model.score(X_train, y_train)
+
+def KNN():
+    KNeighborsClassifierModel = KNeighborsClassifier(n_neighbors=10, weights='uniform', algorithm='auto')
+    KNeighborsClassifierModel.fit(X_train, y_train)
+    Y_pre = KNeighborsClassifierModel.predict(X_test)
+    # Print Details
+    print("Train Score :", KNeighborsClassifierModel.score(X_train, y_train))
+    print("Test Score :", KNeighborsClassifierModel.score(X_test, y_test))
+
+    print(list(Y_pre[:10]))
+    print(list(y_test[:10]))
+    from sklearn.metrics import confusion_matrix
+    CM = confusion_matrix(y_true=y_test, y_pred=Y_pre)
+    print(CM)
+    return KNeighborsClassifierModel.score(X_train, y_train)
+
+def Gaussian ():
+    # priors:   القيم المفترضة السابقة
+    GaussianNBModel = GaussianNB()
+    GaussianNBModel.fit(X_train, y_train)
+
+    # Print Score of algorithm
+    print("Train Score :", GaussianNBModel.score(X_train, y_train))
+    print("test Score :", GaussianNBModel.score(X_test, y_test))
+
+    # Predected
+    Y_pre = GaussianNBModel.predict(X_test)
+    print(list(Y_pre[:20]))
+    print(list(y_test[:20]))
+
+    # confusion_matrix
+    CM = confusion_matrix(y_true=y_test, y_pred=Y_pre)
+    print(CM)
+    return GaussianNBModel.score(X_train, y_train)
+
+def Decision_Tree():
+    # Applying algorithm
+    Decision_Tree_model = DecisionTreeClassifier(criterion='gini', splitter='best', max_depth=3, min_samples_split=2,
+                                                 min_samples_leaf=2, max_features='auto')
+    Decision_Tree_model.fit(X_train, y_train)
+
+    # Show Details
+    print("Train Score :", Decision_Tree_model.score(X_train, y_train))
+    print("Test Score :", Decision_Tree_model.score(X_test, y_test))
+    print("Calsses of model ", Decision_Tree_model.classes_)
+    print("max Feature of model ", Decision_Tree_model.feature_importances_)  # important of every Feature
+    # Calculation Prediction
+    Y_pre = Decision_Tree_model.predict(X_test)
+    print(list(Y_pre[:10]))
+    print(list(y_test[:10]))
+
+    from sklearn.metrics import confusion_matrix
+    CM = confusion_matrix(y_true=y_test, y_pred=Y_pre)
+    print(CM)
+    return Decision_Tree_model.score(X_train, y_train)
+
+def Random_Forest():
+    RandomForestClassifierModel = RandomForestClassifier(n_estimators=100, criterion='gini', max_depth=3,
+                                                         random_state=44)
+    RandomForestClassifierModel.fit(X_train, y_train)
+
+    print("Train Score :", RandomForestClassifierModel.score(X_train, y_train))
+    print("test Score :", RandomForestClassifierModel.score(X_test, y_test))
+    #print("no of features  :", RandomForestClassifierModel.n_features_)
+    #print(" importace  features  :", RandomForestClassifierModel.feature_importances_)
+
+    # Predected
+    Y_pre = RandomForestClassifierModel.predict(X_test)
+    print(list(y_test[:10]))
+    print(list(Y_pre[:10]))
+
+    from sklearn.metrics import confusion_matrix
+    CM = confusion_matrix(y_true=y_test, y_pred=Y_pre)
+    print(CM)
+    return RandomForestClassifierModel.score(X_train, y_train)
+
+LC_Score=Logistaccc_Calssification()
+SVM_Score=SVM()
+KNN_Score=KNN()
+GAUSSIAN_Score=Gaussian()
+DT_Score=Decision_Tree()
+RF_Score=Random_Forest()
+
+#Print all Score
+models = pd.DataFrame({
+    'Model': ['Support Vector Machines', 'KNN', 'Logistic Regression',
+              'Random Forest', 'GAUSSIAN ',
+              'Decision Tree'],
+    'Score': [SVM_Score, KNN_Score, LC_Score,
+              RF_Score, GAUSSIAN_Score, DT_Score]})
+models.sort_values(by='Score', ascending=False)
+print(models)
